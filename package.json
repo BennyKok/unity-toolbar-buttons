@@ -1,11 +1,15 @@
 {
     "name": "com.bennykok.toolbar-buttons",
     "displayName": "Toolbar Buttons",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "unity": "2020.1",
     "keywords": [],
     "description": "Using Toolbar Extender for some extra pre-defined buttons",
     "dependencies": {
         "com.marijnzwemmer.unity-toolbar-extender": "1.3.1"
+    },
+    "author": {
+        "name": "BennyKok",
+        "url": "https://github.com/BennyKok"
     }
 }
