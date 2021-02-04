@@ -85,15 +85,13 @@ namespace BennyKok.ToolbarButtons
                     }
                 }
             }
-
-            // EditorApplication.update -= OnUpdate;
         }
 
         static void OnAttachToToolbar(VisualElement parent)
         {
-#if !UNITY_2021_1_OR_NEWER
-            parent.Add(CreateToolbarButton("Search On Icon", ShowQuickSearch));
-#endif
+// #if !UNITY_2021_1_OR_NEWER
+//             parent.Add(CreateToolbarButton("Search On Icon", ShowQuickSearch));
+// #endif
             parent.Add(CreateToolbarButton("Package Manager", ShowPackageManager));
             parent.Add(CreateToolbarButton("Settings", ShowSettings));
             parent.Add(CreateToolbarButton("UnityEditor.SceneHierarchyWindow", ShowScenes));
@@ -149,24 +147,6 @@ namespace BennyKok.ToolbarButtons
             return result;
         }
 
-        // static void OnToolbarGUI()
-        // {
-        //     GUILayout.FlexibleSpace();
-
-        //     if (GUILayout.Button(EditorGUIUtility.IconContent("Search On Icon", "Quick Search"), ToolbarStyles.commandButtonStylePadding))
-        //         ShowQuickSearch();
-        //     if (GUILayout.Button(EditorGUIUtility.IconContent("Package Manager", "Package Manager"), ToolbarStyles.commandButtonStyle))
-        //         ShowPackageManager();
-        //     if (GUILayout.Button(EditorGUIUtility.IconContent("Settings", "Settings"), ToolbarStyles.commandButtonStyle))
-        //         ShowSettings();
-
-        //     GUILayout.Space(20);
-
-        //     if (GUILayout.Button(EditorGUIUtility.IconContent("UnityEditor.SceneHierarchyWindow"), ToolbarStyles.commandButtonStyle))
-        //         ShowScenes();
-
-        //     GUILayout.Space(20);
-        // }
         private static void ShowScenes()
         {
             var a = new GenericMenu();
@@ -182,11 +162,11 @@ namespace BennyKok.ToolbarButtons
                         if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
                         {
                             EditorSceneManager.OpenScene(p, OpenSceneMode.Single);
-                            if (p == "bootstrap")
-                            {
-                                Selection.activeGameObject = GameObject.FindGameObjectWithTag("Player");
-                                SceneView.FrameLastActiveSceneView();
-                            }
+                            // if (p == "bootstrap")
+                            // {
+                            //     Selection.activeGameObject = GameObject.FindGameObjectWithTag("Player");
+                            //     SceneView.FrameLastActiveSceneView();
+                            // }
                         }
                     });
                 }
