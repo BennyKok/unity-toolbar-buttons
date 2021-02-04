@@ -4,7 +4,7 @@
     "version": "2.0.0",
     "unity": "2021.1",
     "keywords": [],
-    "description": "Using Toolbar Extender for some extra pre-defined buttons",
+    "description": "Using visual elements and reflection for some extra pre-defined toolbar buttons",
     "dependencies": {},
     "author": {
         "name": "BennyKok",
