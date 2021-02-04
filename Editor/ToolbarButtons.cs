@@ -16,9 +16,17 @@ namespace BennyKok.ToolbarButtons
         static Type m_toolbarType = typeof(Editor).Assembly.GetType("UnityEditor.Toolbar");
         static VisualElement parent;
 
+        static ToolbarSceneButtons()
+        {
+            m_currentToolbar = null;
+            EditorApplication.update -= OnUpdate;
+            EditorApplication.update += OnUpdate;
+        }
+
+        static int lastInstanceID;
+
         static void OnUpdate()
         {
-            // Find toolbar
             if (m_currentToolbar == null)
             {
                 var toolbars = Resources.FindObjectsOfTypeAll(m_toolbarType);
@@ -26,13 +34,20 @@ namespace BennyKok.ToolbarButtons
                 // UnityEngine.Debug.Log(m_currentToolbar != null);
             }
 
-            if (m_currentToolbar != null)
+            // If the windows layour reloaded, we need to re create our GUI
+            if (m_currentToolbar != null && parent != null && m_currentToolbar.GetInstanceID() != lastInstanceID)
+            {
+                parent.RemoveFromHierarchy();
+                parent = null;
+                lastInstanceID = m_currentToolbar.GetInstanceID();
+            }
+
+            if (m_currentToolbar != null && parent == null)
             {
                 // foreach (var item in m_currentToolbar.GetType().GetRuntimeFields())
                 //     UnityEngine.Debug.Log(item.Name + " " + item.FieldType + " " + item.IsPublic);
 
-                var root = m_currentToolbar.GetType().GetField("m_Root", BindingFlags.NonPublic |
-                         BindingFlags.Instance);
+                var root = m_currentToolbar.GetType().GetField("m_Root", BindingFlags.NonPublic | BindingFlags.Instance);
                 // UnityEngine.Debug.Log(root);
                 if (root != null)
                 {
@@ -49,6 +64,8 @@ namespace BennyKok.ToolbarButtons
 
                         if (parent != null)
                             parent.RemoveFromHierarchy();
+
+                        parent = null;
 
                         parent = new VisualElement()
                         {
@@ -69,12 +86,12 @@ namespace BennyKok.ToolbarButtons
                 }
             }
 
-            EditorApplication.update -= OnUpdate;
+            // EditorApplication.update -= OnUpdate;
         }
 
         static void OnAttachToToolbar(VisualElement parent)
         {
-#if !UNITY_2021_OR_NEWER
+#if !UNITY_2021_1_OR_NEWER
             parent.Add(CreateToolbarButton("Search On Icon", ShowQuickSearch));
 #endif
             parent.Add(CreateToolbarButton("Package Manager", ShowPackageManager));
@@ -102,13 +119,6 @@ namespace BennyKok.ToolbarButtons
             element.RemoveFromClassList("unity-button");
             element.style.marginRight = 0;
             element.style.marginLeft = 0;
-        }
-
-        static ToolbarSceneButtons()
-        {
-            m_currentToolbar = null;
-            EditorApplication.update -= OnUpdate;
-            EditorApplication.update += OnUpdate;
         }
 
         public static T[] GetAtPath<T>(string path)
@@ -157,7 +167,6 @@ namespace BennyKok.ToolbarButtons
 
         //     GUILayout.Space(20);
         // }
-
         private static void ShowScenes()
         {
             var a = new GenericMenu();
