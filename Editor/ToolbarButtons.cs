@@ -12,6 +12,7 @@ namespace BennyKok.ToolbarButtons
     [InitializeOnLoad]
     public class ToolbarSceneButtons
     {
+        private const string scenesFolder = "Scenes";
         static ScriptableObject m_currentToolbar;
         static Type m_toolbarType = typeof(Editor).Assembly.GetType("UnityEditor.Toolbar");
         static VisualElement parent;
@@ -89,12 +90,13 @@ namespace BennyKok.ToolbarButtons
 
         static void OnAttachToToolbar(VisualElement parent)
         {
-// #if !UNITY_2021_1_OR_NEWER
-//             parent.Add(CreateToolbarButton("Search On Icon", ShowQuickSearch));
-// #endif
+            // #if !UNITY_2021_1_OR_NEWER
+            //             parent.Add(CreateToolbarButton("Search On Icon", ShowQuickSearch));
+            // #endif
             parent.Add(CreateToolbarButton("Package Manager", ShowPackageManager));
             parent.Add(CreateToolbarButton("Settings", ShowSettings));
             parent.Add(CreateToolbarButton("UnityEditor.SceneHierarchyWindow", ShowScenes));
+            parent.Add(CreateToolbarButton("UnityEditor.GameView", ShowBootstrapScene));
         }
 
         static VisualElement CreateToolbarButton(string icon, Action onClick)
@@ -150,7 +152,7 @@ namespace BennyKok.ToolbarButtons
         private static void ShowScenes()
         {
             var a = new GenericMenu();
-            var ls = GetAtPath<UnityEngine.Object>("Scenes");
+            var ls = GetAtPath<UnityEngine.Object>(scenesFolder);
             foreach (var l in ls)
             {
                 var p = AssetDatabase.GetAssetPath(l);
@@ -162,16 +164,25 @@ namespace BennyKok.ToolbarButtons
                         if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
                         {
                             EditorSceneManager.OpenScene(p, OpenSceneMode.Single);
-                            // if (p == "bootstrap")
-                            // {
-                            //     Selection.activeGameObject = GameObject.FindGameObjectWithTag("Player");
-                            //     SceneView.FrameLastActiveSceneView();
-                            // }
+                            if (p == "bootstrap")
+                            {
+                                Selection.activeGameObject = GameObject.FindGameObjectWithTag("Player");
+                                SceneView.FrameLastActiveSceneView();
+                            }
                         }
                     });
                 }
             }
             a.ShowAsContext();
+        }
+
+        private static void ShowBootstrapScene()
+        {
+            var bootstrapPath = "Assets/" + scenesFolder + "/bootstrap.unity";
+            if (!Application.isPlaying && File.Exists(bootstrapPath))
+                EditorSceneManager.OpenScene(bootstrapPath, OpenSceneMode.Additive);
+            Selection.activeGameObject = GameObject.FindGameObjectWithTag("Player");
+            SceneView.FrameLastActiveSceneView();
         }
 
         private static void ShowQuickSearch()
