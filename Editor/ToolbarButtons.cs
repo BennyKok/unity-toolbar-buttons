@@ -107,6 +107,11 @@ namespace BennyKok.ToolbarButtons
             VisualElement iconVE = new VisualElement();
             iconVE.AddToClassList("unity-editor-toolbar-element__icon");
             iconVE.style.backgroundImage = Background.FromTexture2D(EditorGUIUtility.FindTexture(icon));
+#if UNITY_2021_2_OR_NEWER
+            iconVE.style.height = 16;
+            iconVE.style.width = 16;
+            iconVE.style.alignSelf = Align.Center;
+#endif
             buttonVE.Add(iconVE);
 
             return buttonVE;
@@ -117,8 +122,22 @@ namespace BennyKok.ToolbarButtons
             element.AddToClassList("unity-toolbar-button");
             element.AddToClassList("unity-editor-toolbar-element");
             element.RemoveFromClassList("unity-button");
-            element.style.marginRight = 0;
-            element.style.marginLeft = 0;
+#if UNITY_2021_2_OR_NEWER
+            element.style.paddingRight = 8;
+            element.style.paddingLeft = 8;
+            element.style.justifyContent = Justify.Center;
+            element.style.display = DisplayStyle.Flex;
+            element.style.borderTopLeftRadius = 2;
+            element.style.borderTopRightRadius = 2;
+            element.style.borderBottomLeftRadius = 2;
+            element.style.borderBottomRightRadius = 2;
+
+            element.style.marginRight = 1;
+            element.style.marginLeft = 1;
+#else
+            element.style.marginRight = 2;
+            element.style.marginLeft = 2;
+#endif
         }
 
         public static T[] GetAtPath<T>(string path)
