@@ -106,11 +106,13 @@ namespace BennyKok.ToolbarButtons
 
             VisualElement iconVE = new VisualElement();
             iconVE.AddToClassList("unity-editor-toolbar-element__icon");
-            iconVE.style.backgroundImage = Background.FromTexture2D(EditorGUIUtility.FindTexture(icon));
 #if UNITY_2021_2_OR_NEWER
+            iconVE.style.backgroundImage = Background.FromTexture2D((Texture2D)EditorGUIUtility.IconContent(icon).image);
             iconVE.style.height = 16;
             iconVE.style.width = 16;
             iconVE.style.alignSelf = Align.Center;
+#else
+            iconVE.style.backgroundImage = Background.FromTexture2D(EditorGUIUtility.FindTexture(icon));
 #endif
             buttonVE.Add(iconVE);
 
