@@ -1,18 +1,36 @@
-﻿using System.Collections;
-using System.IO;
+﻿using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
+using System.Diagnostics;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 using System;
 using System.Reflection;
 using UnityEngine.UIElements;
+using System.Linq;
 
 namespace BennyKok.ToolbarButtons
 {
+    [Conditional("UNITY_EDITOR"), AttributeUsage(System.AttributeTargets.Method)]
+    public class ToolbarButtonAttribute : Attribute
+    {
+        public string tooltip;
+        public string iconName;
+
+        public int order = 0;
+
+        public ToolbarButtonAttribute() { }
+
+        public ToolbarButtonAttribute(string iconName, string tooltip = null, int order = 0)
+        {
+            this.tooltip = tooltip;
+            this.iconName = iconName;
+            this.order = order;
+        }
+    }
+
     [InitializeOnLoad]
     public class ToolbarSceneButtons
     {
-        private const string scenesFolder = "Scenes";
         static ScriptableObject m_currentToolbar;
         static Type m_toolbarType = typeof(Editor).Assembly.GetType("UnityEditor.Toolbar");
         static VisualElement parent;
@@ -93,15 +111,25 @@ namespace BennyKok.ToolbarButtons
             // #if !UNITY_2021_1_OR_NEWER
             //             parent.Add(CreateToolbarButton("Search On Icon", ShowQuickSearch));
             // #endif
-            parent.Add(CreateToolbarButton("Package Manager", ShowPackageManager));
-            parent.Add(CreateToolbarButton("Settings", ShowSettings));
-            parent.Add(CreateToolbarButton("UnityEditor.SceneHierarchyWindow", ShowScenes));
-            parent.Add(CreateToolbarButton("UnityEditor.GameView", ShowBootstrapScene));
+            var methods = TypeCache.GetMethodsWithAttribute<ToolbarButtonAttribute>();
+            var allAttributes = new Dictionary<MethodInfo, ToolbarButtonAttribute>();
+            foreach (var method in methods)
+            {
+                var attribute = (ToolbarButtonAttribute)method.GetCustomAttributes(typeof(ToolbarButtonAttribute), false).First();
+                if (attribute != null)
+                    allAttributes.Add(method, attribute);
+            }
+
+            foreach (var attr in allAttributes.OrderByDescending(x => x.Value.order))
+            {
+                parent.Add(CreateToolbarButton(attr.Value.iconName, () => attr.Key.Invoke(null, null)));
+            }
         }
 
-        static VisualElement CreateToolbarButton(string icon, Action onClick)
+        static VisualElement CreateToolbarButton(string icon, Action onClick, string tooltip = null)
         {
             Button buttonVE = new Button(onClick);
+            buttonVE.tooltip = tooltip;
             FitChildrenStyle(buttonVE);
 
             VisualElement iconVE = new VisualElement();
@@ -140,88 +168,6 @@ namespace BennyKok.ToolbarButtons
             element.style.marginRight = 2;
             element.style.marginLeft = 2;
 #endif
-        }
-
-        public static T[] GetAtPath<T>(string path)
-        {
-            ArrayList al = new ArrayList();
-            string[] fileEntries = Directory.GetFiles(Application.dataPath + "/" + path);
-
-            foreach (string fileName in fileEntries)
-            {
-                string temp = fileName.Replace("\\", "/");
-                int index = temp.LastIndexOf("/");
-                string localPath = "Assets/" + path;
-
-                if (index > 0)
-                    localPath += temp.Substring(index);
-
-                System.Object t = AssetDatabase.LoadAssetAtPath(localPath, typeof(T));
-
-                if (t != null)
-                    al.Add(t);
-            }
-
-            T[] result = new T[al.Count];
-
-            for (int i = 0; i < al.Count; i++)
-                result[i] = (T)al[i];
-
-            return result;
-        }
-
-        private static void ShowScenes()
-        {
-            var a = new GenericMenu();
-            var ls = GetAtPath<UnityEngine.Object>(scenesFolder);
-            foreach (var l in ls)
-            {
-                var p = AssetDatabase.GetAssetPath(l);
-                var n = Path.GetFileName(p);
-                if (n.EndsWith(".unity"))
-                {
-                    a.AddItem(new GUIContent(Path.GetFileNameWithoutExtension(p)), false, () =>
-                    {
-                        if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
-                        {
-                            EditorSceneManager.OpenScene(p, OpenSceneMode.Single);
-                            if (p == "bootstrap")
-                            {
-                                Selection.activeGameObject = GameObject.FindGameObjectWithTag("Player");
-                                SceneView.FrameLastActiveSceneView();
-                            }
-                        }
-                    });
-                }
-            }
-            a.ShowAsContext();
-        }
-
-        private static void ShowBootstrapScene()
-        {
-            var bootstrapPath = "Assets/" + scenesFolder + "/bootstrap.unity";
-            if (!Application.isPlaying && File.Exists(bootstrapPath))
-                EditorSceneManager.OpenScene(bootstrapPath, OpenSceneMode.Additive);
-            Selection.activeGameObject = GameObject.FindGameObjectWithTag("Player");
-            SceneView.FrameLastActiveSceneView();
-        }
-
-        private static void ShowQuickSearch()
-        {
-            EditorApplication.ExecuteMenuItem("Help/Quick Search");
-        }
-
-        private static void ShowSettings()
-        {
-            var a = new GenericMenu();
-            a.AddItem(new GUIContent("Project"), false, () => EditorApplication.ExecuteMenuItem("Edit/Project Settings..."));
-            a.AddItem(new GUIContent("Preferences"), false, () => EditorApplication.ExecuteMenuItem("Edit/Preferences..."));
-            a.ShowAsContext();
-        }
-
-        private static void ShowPackageManager()
-        {
-            UnityEditor.PackageManager.UI.Window.Open("");
         }
     }
 }
