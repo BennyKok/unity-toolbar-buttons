@@ -2,12 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## [2.2.0](https://gitlab.com/BennyKok/custom-unity-template/compare/v2.1.0...v2.2.0) (2021-06-05)
+## [2.2.0](https://github.com/BennyKok/unity-toolbar-buttons/compare/v2.1.0...v2.2.0) (2021-06-05)
 
 
 ### Features
 
-* custom toolbar button via ToolbarButtonAttribute ([accecde](https://gitlab.com/BennyKok/custom-unity-template/commit/accecde68615ff22d378b91e0c14cda5a91f1f75))
+* custom toolbar button via ToolbarButtonAttribute ([accecde](https://github.com/BennyKok/unity-toolbar-buttons/commit/accecde68615ff22d378b91e0c14cda5a91f1f75))
 
 ## [2.1.0](https://github.com/BennyKok/unity-toolbar-buttons/compare/v2.0.0...v2.1.0) (2021-05-19)
 
