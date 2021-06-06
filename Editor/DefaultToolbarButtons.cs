@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Diagnostics;
 using System.IO;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -38,7 +39,39 @@ namespace BennyKok.ToolbarButtons
             return result;
         }
 
-        [ToolbarButton(iconName = "Package Manager", tooltip = "Package Manager", order = 0)]
+        [ToolbarButton("d_winbtn_win_max", "Open Terminal")]
+        public static void OpenTerminal()
+        {
+            var projectPath = Directory.GetParent(Application.dataPath).FullName;
+
+            Process cmd = new Process();
+#if UNITY_EDITOR_WIN
+            cmd.StartInfo.FileName = "cmd.exe";
+#endif
+#if UNITY_EDITOR_OSX
+            cmd.StartInfo.FileName = "/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal";
+#endif
+            cmd.StartInfo.WorkingDirectory = projectPath;
+            cmd.Start();
+        }
+
+        [ToolbarButton("Folder Icon", "Open Folder")]
+        public static void OpenFolder()
+        {
+            var projectPath = Directory.GetParent(Application.dataPath).FullName;
+
+            Process cmd = new Process();
+#if UNITY_EDITOR_WIN
+            cmd.StartInfo.FileName = "explorer.exe";
+#endif
+            // #if UNITY_EDITOR_OSX
+            //             cmd.StartInfo.FileName = "/bin/bash";
+            // #endif
+            cmd.StartInfo.Arguments = projectPath;
+            cmd.Start();
+        }
+
+        [ToolbarButton(iconName = "Package Manager", tooltip = "Package Manager")]
         public static void ShowPackageManager()
         {
             UnityEditor.PackageManager.UI.Window.Open("");
@@ -79,6 +112,11 @@ namespace BennyKok.ToolbarButtons
                     });
                 }
             }
+            a.AddSeparator("");
+            a.AddItem(new GUIContent("New Scene +"), false, () =>
+            {
+                EditorApplication.ExecuteMenuItem("File/New Scene");
+            });
             a.ShowAsContext();
         }
 
