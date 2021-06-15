@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -10,7 +11,6 @@ namespace BennyKok.ToolbarButtons
     public class DefaultToolbarButtons
     {
         private const string scenesFolder = "Scenes";
-
         public static T[] GetAtPath<T>(string path)
         {
             ArrayList al = new ArrayList();
@@ -90,27 +90,24 @@ namespace BennyKok.ToolbarButtons
         [ToolbarButton("UnityEditor.SceneHierarchyWindow", "Show Scenes")]
         public static void ShowScenes()
         {
+            var sceneList = AssetDatabase.GetAllAssetPaths().Where(s => s.EndsWith(".unity")).ToList();
+            sceneList.Sort();
+            
             var a = new GenericMenu();
-            var ls = GetAtPath<UnityEngine.Object>(scenesFolder);
-            foreach (var l in ls)
+            foreach (var p in sceneList)
             {
-                var p = AssetDatabase.GetAssetPath(l);
-                var n = Path.GetFileName(p);
-                if (n.EndsWith(".unity"))
+                a.AddItem(new GUIContent(Path.GetFileNameWithoutExtension(p)), false, () =>
                 {
-                    a.AddItem(new GUIContent(Path.GetFileNameWithoutExtension(p)), false, () =>
+                    if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
                     {
-                        if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+                        EditorSceneManager.OpenScene(p, OpenSceneMode.Single);
+                        if (p == "bootstrap")
                         {
-                            EditorSceneManager.OpenScene(p, OpenSceneMode.Single);
-                            if (p == "bootstrap")
-                            {
-                                Selection.activeGameObject = GameObject.FindGameObjectWithTag("Player");
-                                SceneView.FrameLastActiveSceneView();
-                            }
+                            Selection.activeGameObject = GameObject.FindGameObjectWithTag("Player");
+                            SceneView.FrameLastActiveSceneView();
                         }
-                    });
-                }
+                    }
+                });
             }
             a.AddSeparator("");
             a.AddItem(new GUIContent("New Scene +"), false, () =>
