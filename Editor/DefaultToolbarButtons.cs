@@ -87,27 +87,50 @@ namespace BennyKok.ToolbarButtons
             a.ShowAsContext();
         }
 
+        public static string ReplaceFirst(string text, string search, string replace)
+        {
+            int pos = text.IndexOf(search);
+            if (pos < 0)
+            {
+                return text;
+            }
+            return text.Substring(0, pos) + replace + text.Substring(pos + search.Length);
+        }
+
+        public static string ReplaceLast(string Source, string Find, string Replace)
+        {
+            int place = Source.LastIndexOf(Find);
+
+            if (place == -1)
+                return Source;
+
+            string result = Source.Remove(place, Find.Length).Insert(place, Replace);
+            return result;
+        }
+
         [ToolbarButton("UnityEditor.SceneHierarchyWindow", "Show Scenes")]
         public static void ShowScenes()
         {
             var sceneList = AssetDatabase.GetAllAssetPaths().Where(s => s.EndsWith(".unity")).ToList();
             sceneList.Sort();
-            
+
             var a = new GenericMenu();
             foreach (var p in sceneList)
             {
-                a.AddItem(new GUIContent(Path.GetFileNameWithoutExtension(p)), false, () =>
-                {
-                    if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
-                    {
-                        EditorSceneManager.OpenScene(p, OpenSceneMode.Single);
-                        if (p == "bootstrap")
-                        {
-                            Selection.activeGameObject = GameObject.FindGameObjectWithTag("Player");
-                            SceneView.FrameLastActiveSceneView();
-                        }
-                    }
-                });
+                string label = ReplaceLast(p, ".unity", "");
+                label = ReplaceFirst(label, "Assets/", "");
+                a.AddItem(new GUIContent(label), false, () =>
+                 {
+                     if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+                     {
+                         EditorSceneManager.OpenScene(p, OpenSceneMode.Single);
+                         if (p == "bootstrap")
+                         {
+                             Selection.activeGameObject = GameObject.FindGameObjectWithTag("Player");
+                             SceneView.FrameLastActiveSceneView();
+                         }
+                     }
+                 });
             }
             a.AddSeparator("");
             a.AddItem(new GUIContent("New Scene +"), false, () =>
