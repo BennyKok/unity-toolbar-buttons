@@ -3,7 +3,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using UnityEditor;
+using UnityEditor.IMGUI.Controls;
 using UnityEditor.SceneManagement;
+using UnityEditor.ShortcutManagement;
 using UnityEngine;
 
 namespace BennyKok.ToolbarButtons
@@ -109,17 +111,18 @@ namespace BennyKok.ToolbarButtons
         }
 
         [ToolbarButton("UnityEditor.SceneHierarchyWindow", "Show Scenes")]
+        [Shortcut("Show Scenes", KeyCode.S)]
         public static void ShowScenes()
         {
             var sceneList = AssetDatabase.GetAllAssetPaths().Where(s => s.EndsWith(".unity")).ToList();
             sceneList.Sort();
 
-            var a = new GenericMenu();
+            var a = new GenericAdvancedDropdown("Scenes");
             foreach (var p in sceneList)
             {
                 string label = ReplaceLast(p, ".unity", "");
                 label = ReplaceFirst(label, "Assets/", "");
-                a.AddItem(new GUIContent(label), false, () =>
+                a.AddItem(label, () =>
                  {
                      if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
                      {
@@ -132,12 +135,12 @@ namespace BennyKok.ToolbarButtons
                      }
                  });
             }
-            a.AddSeparator("");
-            a.AddItem(new GUIContent("New Scene +"), false, () =>
+            // a.AddSeparator("");
+            a.AddItem("New Scene +", () =>
             {
                 EditorApplication.ExecuteMenuItem("File/New Scene");
             });
-            a.ShowAsContext();
+            a.ShowAsContext(10);
         }
 
         [ToolbarButton("UnityEditor.GameView", "Show Bootstrap Scene")]
