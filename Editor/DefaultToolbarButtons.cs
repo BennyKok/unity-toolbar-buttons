@@ -143,15 +143,15 @@ namespace BennyKok.ToolbarButtons
             a.ShowAsContext(10);
         }
 
-        [ToolbarButton("UnityEditor.GameView", "Show Bootstrap Scene")]
-        public static void ShowBootstrapScene()
-        {
-            var bootstrapPath = "Assets/" + scenesFolder + "/bootstrap.unity";
-            if (!Application.isPlaying && File.Exists(bootstrapPath))
-                EditorSceneManager.OpenScene(bootstrapPath, OpenSceneMode.Additive);
-            Selection.activeGameObject = GameObject.FindGameObjectWithTag("Player");
-            SceneView.FrameLastActiveSceneView();
-        }
+        //[ToolbarButton("UnityEditor.GameView", "Show Bootstrap Scene")]
+        //public static void ShowBootstrapScene()
+        //{
+        //    var bootstrapPath = "Assets/" + scenesFolder + "/bootstrap.unity";
+        //    if (!Application.isPlaying && File.Exists(bootstrapPath))
+        //        EditorSceneManager.OpenScene(bootstrapPath, OpenSceneMode.Additive);
+        //    Selection.activeGameObject = GameObject.FindGameObjectWithTag("Player");
+        //    SceneView.FrameLastActiveSceneView();
+        //}
 
         public static void ShowQuickSearch()
         {
