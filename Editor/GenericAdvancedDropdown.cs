@@ -54,7 +54,13 @@ namespace BennyKok.ToolbarButtons
 
         public GenericAdvancedDropdown(AdvancedDropdownState state) : base(state) { }
         public GenericAdvancedDropdown() : base(new AdvancedDropdownState()) { }
+
         public GenericAdvancedDropdown(string title) : base(new AdvancedDropdownState())
+        {
+            this.title = title;
+        }
+
+        public GenericAdvancedDropdown(string title, AdvancedDropdownState state) : base(state)
         {
             this.title = title;
         }

@@ -13,6 +13,8 @@ namespace BennyKok.ToolbarButtons
     public class DefaultToolbarButtons
     {
         private const string scenesFolder = "Scenes";
+        private static AdvancedDropdownState scenesState = new AdvancedDropdownState();
+
         public static T[] GetAtPath<T>(string path)
         {
             ArrayList al = new ArrayList();
@@ -117,13 +119,20 @@ namespace BennyKok.ToolbarButtons
             var sceneList = AssetDatabase.GetAllAssetPaths().Where(s => s.EndsWith(".unity")).ToList();
             sceneList.Sort();
 
-            var a = new GenericAdvancedDropdown("Scenes");
+            const string prefKey = "ToolbarScenesState";
+            var jsonState = EditorPrefs.GetString(prefKey);
+            if (!string.IsNullOrEmpty(jsonState))
+            {
+                EditorJsonUtility.FromJsonOverwrite(jsonState, scenesState);
+            }
+            var a = new GenericAdvancedDropdown("All Scenes", scenesState);
             foreach (var p in sceneList)
             {
                 string label = ReplaceLast(p, ".unity", "");
                 label = ReplaceFirst(label, "Assets/", "");
                 a.AddItem(label, () =>
                  {
+                     EditorPrefs.SetString(prefKey, EditorJsonUtility.ToJson(scenesState));
                      if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
                      {
                          EditorSceneManager.OpenScene(p, OpenSceneMode.Single);
