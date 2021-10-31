@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Diagnostics;
 using System.IO;
@@ -74,6 +75,21 @@ namespace BennyKok.ToolbarButtons
             cmd.StartInfo.Arguments = projectPath;
             cmd.Start();
         }
+
+#if UNITY_EDITOR_WIN
+        [ToolbarButton("UnityEditor.VersionControl", "Open Fork")]
+        public static void OpenFork()
+        {
+            var projectPath = Directory.GetParent(Application.dataPath).FullName;
+            var forkPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+
+            Process cmd = new Process();
+            cmd.StartInfo.FileName = forkPath + "\\Fork\\Fork.exe";
+
+            cmd.StartInfo.Arguments = projectPath;
+            cmd.Start();
+        }
+#endif
 
         [ToolbarButton(iconName = "Package Manager", tooltip = "Package Manager")]
         public static void ShowPackageManager()
